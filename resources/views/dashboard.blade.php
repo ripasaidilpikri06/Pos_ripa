@@ -362,13 +362,18 @@
                                 @forelse ($produkTerlaris as $produk)
                                     <tr>
                                         <td>
-                                            <span class="fw-bold text-white d-block">{{ $produk->nama }}</span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if($loop->first)
+                                                    <span title="Top Seller">⭐</span>
+                                                @endif
+                                                <span class="fw-bold text-white d-block">{{ $produk->nama }}</span>
+                                            </div>
                                         </td>
                                         <td class="text-center text-light">
                                             {{ $produk->stok }} unit
                                         </td>
                                         <td class="text-end">
-                                            <span class="badge badge-soft-success rounded-pill px-3 py-1 fw-semibold">
+                                            <span class="badge {{ $loop->first ? 'bg-warning text-dark' : 'badge-soft-success' }} rounded-pill px-3 py-1 fw-semibold">
                                                 {{ $produk->total_terjual }} Terjual
                                             </span>
                                         </td>

@@ -321,7 +321,6 @@
     ===================================================== */
 
     @media (max-width: 991px) {
-
         .pos-container {
             padding: 20px;
         }
@@ -329,11 +328,9 @@
         .product-list-container {
             max-height: none;
         }
-
     }
 
     @media (max-width: 576px) {
-
         .pos-container {
             padding: 15px;
         }
@@ -345,10 +342,8 @@
         .transaction-badge {
             font-size: 12px !important;
         }
-
     }
 </style>
-
 
 <!-- =====================================================
      MAIN CONTAINER
@@ -356,83 +351,40 @@
 
 <div class="pos-container">
 
-    <!-- =================================================
-         FLASH ERROR
-    ================================================== -->
-
+    <!-- FLASH ERROR -->
     @if (session('errors'))
-
         <div class="alert alert-danger rounded-4 shadow-sm mb-4 border-0">
-
             {{ session('errors') }}
-
         </div>
-
     @endif
 
-
-    <!-- =================================================
-         HEADER
-    ================================================== -->
-
+    <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <h2 class="page-title m-0">
-
             🖥️ Transaksi Kasir (POS)
-
         </h2>
 
-
         @if($sale)
-
             <span class="badge transaction-badge fs-6 px-3 py-2 rounded-pill">
-
                 No. Transaksi #{{ $sale->id }}
-
             </span>
-
         @endif
-
     </div>
 
-
-    <!-- =================================================
-         MAIN ROW
-    ================================================== -->
-
+    <!-- MAIN ROW -->
     <div class="row g-4">
 
-
-        <!-- =============================================
-             DAFTAR PRODUK
-        ============================================== -->
-
+        <!-- DAFTAR PRODUK -->
         <div class="col-lg-6">
-
             <div class="card pos-card p-3 h-100">
-
                 <div class="card-body p-2">
-
-
                     <h5 class="mb-3">
-
                         📦 Daftar Produk
-
                     </h5>
 
-
-                    <!-- =================================
-                         SEARCH
-                    ================================== -->
-
+                    <!-- SEARCH -->
                     <div class="mb-3">
-
-                        <form
-                            method="GET"
-                            action="{{ route('penjualan.create') }}"
-                        >
-
+                        <form method="GET" action="{{ route('penjualan.create') }}">
                             <input
                                 type="text"
                                 name="search"
@@ -441,505 +393,301 @@
                                 placeholder="Cari nama produk..."
                                 onchange="this.form.submit()"
                             >
-
                         </form>
-
                     </div>
 
-
-                    <!-- =================================
-                         PRODUCT LIST
-                    ================================== -->
-
+                    <!-- PRODUCT LIST -->
                     <div class="product-list-container">
-
                         @forelse ($products as $product)
-
-
                             <form
                                 method="POST"
                                 action="{{ route('ItemPenjualan.store') }}"
                                 class="row g-2 align-items-center mb-2 p-2 rounded-3 product-item"
                             >
-
                                 @csrf
-
-
-                                <input
-                                    type="hidden"
-                                    name="product_id"
-                                    value="{{ $product->id }}"
-                                >
-
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
 
                                 @if($sale)
-
-                                    <input
-                                        type="hidden"
-                                        name="penjualan_id"
-                                        value="{{ $sale->id }}"
-                                    >
-
+                                    <input type="hidden" name="penjualan_id" value="{{ $sale->id }}">
                                 @endif
 
-
                                 <!-- PRODUCT INFO -->
-
                                 <div class="col-7">
-
                                     <div class="d-flex align-items-center gap-2">
-
-
                                         @if($product->foto)
-
                                             <img
                                                 src="{{ asset('storage/' . $product->foto) }}"
                                                 alt="{{ $product->nama }}"
                                                 class="product-img-thumb border"
                                             >
-
                                         @else
-
-                                            <div
-                                                class="product-img-thumb d-flex align-items-center justify-content-center text-muted border small"
-                                            >
-
+                                            <div class="product-img-thumb d-flex align-items-center justify-content-center text-muted border small">
                                                 📷
-
                                             </div>
-
                                         @endif
 
-
                                         <div class="text-truncate">
-
                                             <div class="product-name text-truncate">
-
                                                 {{ $product->nama }}
-
                                             </div>
-
-
                                             <small class="product-price">
-
-                                                Rp
-                                                {{ number_format($product->harga_jual, 0, ',', '.') }}
-
+                                                Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
                                             </small>
-
                                         </div>
-
                                     </div>
-
                                 </div>
 
-
                                 <!-- QUANTITY -->
-
                                 <div class="col-3">
-
                                     <input
                                         type="number"
                                         name="quantity"
                                         value="1"
                                         min="1"
                                         class="form-control rounded-pill quantity-input"
-
                                         {{ ($sale?->status === 'COMPLETED' || $sale?->status === 'Selesai') ? 'disabled' : '' }}
                                     >
-
                                 </div>
 
-
                                 <!-- ADD -->
-
                                 <div class="col-2">
-
                                     <button
                                         type="submit"
                                         class="btn btn-add-product w-100 rounded-pill"
-
                                         {{ ($sale?->status === 'COMPLETED' || $sale?->status === 'Selesai') ? 'disabled' : '' }}
                                     >
-
                                         +
-
                                     </button>
-
                                 </div>
-
                             </form>
-
-
                         @empty
-
-
                             <div class="text-center empty-cart py-5">
-
                                 Produk tidak ditemukan.
-
                             </div>
-
-
                         @endforelse
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
-
-        <!-- =============================================
-             KERANJANG
-        ============================================== -->
-
+        <!-- KERANJANG -->
         <div class="col-lg-6">
-
-            <div
-                class="card pos-card p-3 h-100 d-flex flex-column justify-content-between"
-            >
-
+            <div class="card pos-card p-3 h-100 d-flex flex-column justify-content-between">
                 <div>
-
-
                     <h5 class="mb-3">
-
                         🛒 Keranjang Belanja
-
                     </h5>
 
-
-                    <!-- =================================
-                         TABLE CART
-                    ================================== -->
-
+                    <!-- TABLE CART -->
                     <div class="table-responsive cart-wrapper mb-3">
-
-                        <table
-                            class="table table-hover align-middle table-cart"
-                        >
-
+                        <table class="table table-hover align-middle table-cart">
                             <thead>
-
                                 <tr class="small">
-
-                                    <th>
-                                        Produk
-                                    </th>
-
-                                    <th>
-                                        Harga
-                                    </th>
-
-                                    <th style="width: 90px;">
-                                        Qty
-                                    </th>
-
-                                    <th class="text-end">
-                                        Subtotal
-                                    </th>
-
-                                    <th class="text-center">
-                                        Aksi
-                                    </th>
-
+                                    <th>Produk</th>
+                                    <th>Harga</th>
+                                    <th style="width: 90px;">Qty</th>
+                                    <th class="text-end">Subtotal</th>
+                                    <th class="text-center">Aksi</th>
                                 </tr>
-
                             </thead>
-
-
                             <tbody>
-
-
-                                @forelse (
-                                    $sale?->itemPenjualan
-                                    ?? $sale?->details
-                                    ?? []
-                                    as $item
-                                )
-
-
+                                @forelse ($sale?->itemPenjualan ?? $sale?->details ?? [] as $item)
                                     <tr>
-
                                         <!-- PRODUCT -->
-
                                         <td>
-
                                             <span class="cart-product-name d-block">
-
                                                 {{ $item->produk?->nama ?? 'Produk Dihapus' }}
-
                                             </span>
-
                                         </td>
-
 
                                         <!-- PRICE -->
-
                                         <td class="small cart-price">
-
-                                            Rp
-                                            {{ number_format($item->harga_satuan, 0, ',', '.') }}
-
+                                            Rp {{ number_format($item->harga_satuan, 0, ',', '.') }}
                                         </td>
 
-
                                         <!-- QTY -->
-
                                         <td>
-
                                             <form
                                                 method="POST"
                                                 action="{{ route('ItemPenjualan.update', $item->id) }}"
                                             >
-
                                                 @csrf
-
                                                 @method('PUT')
-
-
                                                 <input
                                                     type="number"
                                                     name="quantity"
-
                                                     value="{{ $item->kuantitas ?? $item->jumlah }}"
-
                                                     min="1"
-
                                                     class="form-control form-control-sm text-center rounded-pill quantity-input"
-
                                                     onchange="this.form.submit()"
-
                                                     {{ ($sale?->status === 'COMPLETED' || $sale?->status === 'Selesai') ? 'disabled' : '' }}
                                                 >
-
                                             </form>
-
                                         </td>
-
 
                                         <!-- SUBTOTAL -->
-
                                         <td class="text-end cart-subtotal">
-
-                                            Rp
-                                            {{ number_format($item->subtotal, 0, ',', '.') }}
-
+                                            Rp {{ number_format($item->subtotal, 0, ',', '.') }}
                                         </td>
 
-
                                         <!-- DELETE -->
-
                                         <td class="text-center">
-
                                             @can('delete', $item)
-
                                                 <form
                                                     method="POST"
                                                     action="{{ route('ItemPenjualan.destroy', $item->id) }}"
                                                 >
-
                                                     @csrf
-
                                                     @method('DELETE')
-
-
                                                     <button
                                                         type="submit"
                                                         class="btn btn-outline-danger btn-sm rounded-circle"
-
                                                         {{ ($sale?->status === 'COMPLETED' || $sale?->status === 'Selesai') ? 'disabled' : '' }}
                                                     >
-
                                                         🗑️
-
                                                     </button>
-
                                                 </form>
-
                                             @endcan
-
                                         </td>
-
                                     </tr>
-
-
                                 @empty
-
-
                                     <tr>
-
-                                        <td
-                                            colspan="5"
-                                            class="text-center empty-cart py-5"
-                                        >
-
+                                        <td colspan="5" class="text-center empty-cart py-5">
                                             Keranjang masih kosong
-
                                         </td>
-
                                     </tr>
-
-
                                 @endforelse
-
-
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
 
-
-                <!-- =================================
-                     FOOTER CHECKOUT
-                ================================== -->
-
+                <!-- FOOTER CHECKOUT -->
                 <div class="total-section pt-3">
-
-
                     <!-- TOTAL -->
-
-                    <div
-                        class="d-flex justify-content-between align-items-center mb-3"
-                    >
-
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="fs-5 total-label">
-
                             Total Pembayaran:
-
                         </span>
-
-
                         <span class="fs-3 total-price">
-
-                            Rp
-                            {{ number_format($sale?->total_pembayaran ?? 0, 0, ',', '.') }}
-
+                            Rp {{ number_format($sale?->total_pembayaran ?? 0, 0, ',', '.') }}
                         </span>
-
                     </div>
 
-
                     @if($sale)
-
-
-                        <!-- =========================
-                             CHECKOUT FORM
-                        ========================== -->
-
+                        <!-- CHECKOUT FORM -->
                         <form
                             method="POST"
                             action="{{ route('penjualan.update', $sale->id) }}"
                             onsubmit="return confirm('Yakin ingin menyelesaikan transaksi ini?')"
                             class="mb-2"
                         >
-
                             @csrf
-
                             @method('PUT')
 
-
                             <!-- PAYMENT -->
-
                             <select
+                                id="paymentMethodSelect"
                                 name="payment_method"
                                 class="form-select form-select-lg mb-2 rounded-pill fs-6 payment-select"
                                 required
-
                                 {{ ($sale->status === 'COMPLETED' || $sale->status === 'Selesai') ? 'disabled' : '' }}
                             >
-
-                                <option value="">
-                                    -- Pilih Metode Pembayaran --
-                                </option>
-
-                                <option
-                                    value="CASH"
-                                    {{ $sale->metode_pembayaran === 'CASH' ? 'selected' : '' }}
-                                >
+                                <option value="">-- Pilih Metode Pembayaran --</option>
+                                <option value="CASH" {{ $sale->metode_pembayaran === 'CASH' ? 'selected' : '' }}>
                                     Cash (Tunai)
                                 </option>
-
-                                <option
-                                    value="QRIS"
-                                    {{ $sale->metode_pembayaran === 'QRIS' ? 'selected' : '' }}
-                                >
+                                <option value="QRIS" {{ $sale->metode_pembayaran === 'QRIS' ? 'selected' : '' }}>
                                     QRIS
                                 </option>
-
-                                <option
-                                    value="TRANSFER"
-                                    {{ $sale->metode_pembayaran === 'TRANSFER' ? 'selected' : '' }}
-                                >
+                                <option value="TRANSFER" {{ $sale->metode_pembayaran === 'TRANSFER' ? 'selected' : '' }}>
                                     Transfer Bank
                                 </option>
-
                             </select>
 
-
                             <!-- CHECKOUT BUTTON -->
-
                             <button
                                 class="btn btn-checkout btn-lg w-100 rounded-pill shadow-sm"
-
                                 {{ ($sale->status === 'COMPLETED' || $sale->status === 'Selesai') ? 'disabled' : '' }}
                             >
-
                                 🚀 Checkout Transaksi
-
                             </button>
-
                         </form>
 
-
-                        <!-- =========================
-                             CANCEL TRANSACTION
-                        ========================== -->
-
+                        <!-- CANCEL TRANSACTION -->
                         @can('delete', $sale)
-
                             <form
                                 method="POST"
                                 action="{{ route('penjualan.destroy', $sale->id) }}"
                                 onsubmit="return confirm('Yakin ingin membatalkan transaksi ini?')"
                             >
-
                                 @csrf
-
                                 @method('DELETE')
-
-
                                 <button
                                     class="btn btn-cancel w-100 rounded-pill fw-semibold"
-
                                     {{ ($sale->status === 'COMPLETED' || $sale->status === 'Selesai') ? 'disabled' : '' }}
                                 >
-
                                     ❌ Batalkan Transaksi
-
                                 </button>
-
                             </form>
-
                         @endcan
-
-
                     @endif
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
+
+<!-- =====================================================
+     MODAL POPUP QRIS
+===================================================== -->
+<div class="modal fade" id="qrisModal" tabindex="-1" aria-labelledby="qrisModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-dark border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="qrisModalLabel">Pembayaran QRIS</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <p class="text-muted mb-2">Scan kode QRIS di bawah ini untuk menyelesaikan pembayaran:</p>
+                
+                <!-- Dynamic QR Code generator using API -->
+                <div class="p-3 bg-white d-inline-block rounded-3 border mb-3">
+                    <img 
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=POS-TRANSAKSI-{{ $sale?->id }}-TOTAL-{{ $sale?->total_pembayaran }}" 
+                        alt="QRIS Code" 
+                        class="img-fluid"
+                        style="max-width: 220px;"
+                    >
+                </div>
+                
+                <h4 class="fw-bold text-primary mb-0">
+                    Rp {{ number_format($sale?->total_pembayaran ?? 0, 0, ',', '.') }}
+                </h4>
+                <small class="text-muted">No. Transaksi: #{{ $sale?->id }}</small>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================
+     JAVASCRIPT SCRIPT
+===================================================== -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const paymentSelect = document.getElementById('paymentMethodSelect');
+        if (paymentSelect) {
+            paymentSelect.addEventListener('change', function () {
+                if (this.value === 'QRIS') {
+                    const qrisModal = new bootstrap.Modal(document.getElementById('qrisModal'));
+                    qrisModal.show();
+                }
+            });
+        }
+    });
+</script>
 
 @endsection

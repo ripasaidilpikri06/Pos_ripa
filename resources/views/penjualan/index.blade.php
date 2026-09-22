@@ -128,6 +128,38 @@
     .btn-close {
         filter: invert(1) grayscale(100%) brightness(200%);
     }
+
+    /* CSS Khusus Cetak Barcode / Struk */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .print-area, .print-area * {
+            visibility: visible;
+            color: #000 !important;
+        }
+        .print-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 10px;
+            background: #fff !important;
+        }
+        .print-area .text-white, 
+        .print-area .text-light, 
+        .print-area .text-secondary,
+        .print-area .text-info {
+            color: #000 !important;
+        }
+        .print-area .table {
+            color: #000 !important;
+            border-color: #ddd !important;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
 </style>
 
 <div class="dashboard-container">
@@ -176,13 +208,13 @@
             <table class="table table-custom align-middle">
                 <thead>
                     <tr>
-                        <th scope="col" width="6%">#</th>
+                        <th scope="col" width="5%">#</th>
                         <th scope="col">Tanggal Transaksi</th>
                         <th scope="col">Kasir</th>
                         <th scope="col">Total Pembayaran</th>
                         <th scope="col">Metode Pembayaran</th>
                         <th scope="col">Status</th>
-                        <th scope="col" class="text-center" width="24%">Aksi</th>
+                        <th scope="col" class="text-center" width="28%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -203,10 +235,17 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <div class="d-flex justify-content-center gap-1">
+                                <div class="d-flex justify-content-center gap-1 flex-wrap">
                                     <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#detailModal{{ $sale->id }}">
                                         👁️ Detail
                                     </button>
+
+                                    <!-- Tombol Print Barcode QR HANYA jika metode pembayaran QR / QRIS -->
+                                    @if(str_contains(strtoupper($sale->metode_pembayaran), 'QR'))
+                                        <button type="button" class="btn btn-sm btn-info text-dark rounded-pill px-3 fw-semibold" onclick="printReceipt('printableArea{{ $sale->id }}')">
+                                            🖨️ Print QR
+                                        </button>
+                                    @endif
 
                                     @can('view', $sale)
                                         <a href="{{ route('penjualan.edit', $sale) }}" class="btn btn-sm btn-warning rounded-pill px-3 fw-semibold text-dark">
@@ -246,7 +285,7 @@
     </div>
 </div>
 
-<!-- ================= MODAL DETAIL PENJUALAN ================= -->
+<!-- ================= MODAL DETAIL & PRINT PENJUALAN ================= -->
 @foreach($sales as $sale)
     <div class="modal fade" id="detailModal{{ $sale->id }}" tabindex="-1" aria-labelledby="detailModalLabel{{ $sale->id }}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -257,25 +296,35 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-start p-4">
+                
+                <!-- Area Struk Detail -->
+                <div class="modal-body text-start p-4 print-area" id="printableArea{{ $sale->id }}">
+                    
+                    <!-- Header Struk saat diprint -->
+                    <div class="text-center mb-4">
+                        <h4 class="fw-bold mb-1">TOKO SNEAKERS</h4>
+                        <p class="small text-secondary mb-0">Bukti Pembayaran Transaksi</p>
+                        <small class="text-secondary">ID Transaksi: #{{ $sale->id }}</small>
+                    </div>
+
                     <!-- Informasi Kasir & Tanggal -->
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <p class="mb-1 text-secondary small">Kasir</p>
                             <p class="fw-bold text-white mb-0">{{ $sale->user->name ?? '-' }}</p>
                         </div>
-                        <div class="col-md-6 text-md-end">
+                        <div class="col-6 text-end">
                             <p class="mb-1 text-secondary small">Waktu Transaksi</p>
                             <p class="fw-bold text-white mb-0">{{ $sale->created_at->translatedFormat('d F Y, H:i:s') }}</p>
                         </div>
                     </div>
 
-                    <!-- Tabel Item Produk Beserta Foto -->
-                    <div class="table-responsive rounded-3 border border-secondary border-opacity-25">
+                    <!-- Tabel Item Produk -->
+                    <div class="table-responsive rounded-3 border border-secondary border-opacity-25 mb-3">
                         <table class="table table-custom align-middle mb-0">
                             <thead>
                                 <tr>
-                                    <th>Foto</th>
+                                    <th class="no-print">Foto</th>
                                     <th>Nama Produk</th>
                                     <th class="text-center">Jumlah</th>
                                     <th class="text-end">Harga Satuan</th>
@@ -291,7 +340,7 @@
 
                                 @forelse($items as $detail)
                                     <tr>
-                                        <td style="width: 60px;">
+                                        <td style="width: 60px;" class="no-print">
                                             @if(optional($detail->produk)->foto)
                                                 <img src="{{ asset('storage/' . $detail->produk->foto) }}" alt="{{ $detail->produk->nama }}" class="product-img-thumb border border-secondary">
                                             @else
@@ -325,7 +374,7 @@
                     </div>
 
                     <!-- Ringkasan Total & Pembayaran -->
-                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2">
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-secondary border-opacity-25">
                         <div>
                             <span class="text-secondary small d-block">Metode Pembayaran</span>
                             <span class="badge badge-soft-light px-3 py-2 rounded-pill mt-1">
@@ -337,13 +386,52 @@
                             <span class="fs-4 fw-bold text-info">Rp {{ number_format($sale->total_pembayaran, 0, ',', '.') }}</span>
                         </div>
                     </div>
+
+                    <!-- HANYA MENAMPILKAN BARCODE / QR JIKA METODE PEMBAYARAN QR / QRIS -->
+                    @if(str_contains(strtoupper($sale->metode_pembayaran), 'QR'))
+                        <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
+                            <p class="small text-secondary mb-2">QR Barcode Bukti Pembayaran QRIS</p>
+                            
+                            <div class="p-3 bg-white d-inline-block rounded-3 shadow-sm">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ urlencode('QRIS-' . $sale->id . '-' . $sale->total_pembayaran . '-' . $sale->status) }}" 
+                                     alt="QR Hasil Pembayaran" 
+                                     class="img-fluid"
+                                     style="width: 140px; height: 140px;">
+                            </div>
+                            
+                            <p class="text-secondary mt-2 mb-0" style="font-size: 0.8rem;">
+                                TRX-ID: #{{ $sale->id }} | Status: <strong class="text-success">{{ strtoupper($sale->status) }}</strong>
+                            </p>
+                        </div>
+                    @endif
+
                 </div>
+
                 <div class="modal-footer border-top-0 pt-0">
+                    <!-- Tombol Cetak dalam modal HANYA muncul untuk pembayaran QR -->
+                    @if(str_contains(strtoupper($sale->metode_pembayaran), 'QR'))
+                        <button type="button" class="btn btn-info text-dark rounded-pill px-4 fw-semibold" onclick="printReceipt('printableArea{{ $sale->id }}')">
+                            🖨️ Cetak Barcode QR
+                        </button>
+                    @endif
                     <button type="button" class="btn btn-secondary rounded-pill px-4 text-white" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
 @endforeach
+
+<!-- Script Print Area -->
+<script>
+    function printReceipt(areaId) {
+        var printContents = document.getElementById(areaId).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = '<div class="print-area">' + printContents + '</div>';
+        window.print();
+        document.body.innerHTML = originalContents;
+        window.location.reload();
+    }
+</script>
 
 @endsection
